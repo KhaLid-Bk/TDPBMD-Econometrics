@@ -2,7 +2,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![R](https://img.shields.io/badge/R-%E2%89%A54.0-blue.svg)](https://www.r-project.org/)
-[![DOI](https://img.shields.io/badge/PFE-2025-green.svg)]
+![DOI](https://img.shields.io/badge/PFE-2025-green.svg)
 
 ## Description
 
