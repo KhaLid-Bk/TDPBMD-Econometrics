@@ -1,0 +1,77 @@
+---
+title: "Transformation digitale et performance boursiere Modelisation econometriques"
+author: "BOUKHIT KHALID"
+output: 
+  html_document: 
+    toc: true
+    toc_float: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+<!-- Exploratory Data Analysis -->
+```{r}
+suppressPackageStartupMessages({
+  library(readr); library(FactoMineR); library(ggplot2); library(dplyr)
+  library(plm); library(scales); library(viridis); library(tidyr)
+})
+
+# --- Load Data ---------------------------------------------------------------
+TP <- read_csv(file.choose())
+TP$Secteur <- as.factor(TP$Secteur)
+TP$year <- as.factor(TP$year)
+
+# --- Dataset Overview --------------------------------------------------------
+cat("Dataset dimensions:", nrow(TP), "rows x", ncol(TP), "columns\n")
+cat("Unique companies:", length(unique(TP$id)), "\n")
+cat("Years:", paste(sort(unique(TP$year)), collapse = ", "), "\n")
+cat("Sectors:", nlevels(TP$Secteur), "\n\n")
+
+# --- Sector Distribution -----------------------------------------------------
+g1 <- ggplot(TP, aes(x = Secteur)) +
+  geom_bar(fill = "#1f77b4", alpha = 0.7) +
+  coord_flip() +
+  labs(title = "Observations by Sector", x = "", y = "Count") +
+  theme_minimal()
+g1
+
+# --- Age Distribution --------------------------------------------------------
+g2 <- ggplot(TP, aes(x = Age)) +
+  geom_histogram(fill = "#ff7f0e", bins = 20, alpha = 0.7) +
+  labs(title = "Company Age Distribution", x = "Age (years)", y = "Count") +
+  theme_minimal()
+g2
+
+# --- Digital Maturity Components (Mean by Sector) ----------------------------
+md_vars <- c("engagementDirection", "Competences", "Automatisation",
+             "AdoptionTech", "CoutsOperationnels", "InvestissementDigital")
+TP_long <- TP %>%
+  select(Secteur, all_of(md_vars)) %>%
+  tidyr::pivot_longer(cols = all_of(md_vars), names_to = "Variable", values_to = "Score")
+
+g3 <- ggplot(TP_long, aes(x = Variable, y = Score, fill = Secteur)) +
+  geom_boxplot(alpha = 0.7) +
+  labs(title = "Digital Maturity Components by Sector", x = "", y = "Score (1-5)") +
+  theme_minimal() + theme(axis.text.x = element_text(angle = 45, hjust = 1),
+                          legend.position = "bottom")
+g3
+
+# --- Financial Variables Summary ---------------------------------------------
+fin_vars <- c("CA", "ROE", "ROA", "PER", "PBR", "DividendYield")
+cat("\nFinancial Variables Summary:\n")
+print(summary(TP[, fin_vars]))
+
+# --- Correlation Matrix (MD components) --------------------------------------
+cor_mat <- cor(TP[, md_vars], use = "complete.obs")
+cat("\nCorrelation Matrix (MD components):\n")
+print(round(cor_mat, 2))
+
+cat("\nExploratory analysis complete.\n")
+
+```
+
+
+

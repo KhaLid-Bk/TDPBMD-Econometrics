@@ -1,0 +1,1025 @@
+==================================================================
+  AUTOMATED ANALYSIS REPORT
+  Digital Transformation and Stock Market Performance
+  Author: BOUKHIT KHALID (2025)
+==================================================================
+  Generated: 2026-04-14 15:52:45 
+==================================================================
+
+
+--- DATA SUMMARY ---
+Rows: 96 
+Columns: 31 
+Unique entities: 32 
+Years: 2021, 2022, 2023 
+Sectors: 24 
+
+==================================================================
+  COMPOSITE INDEX CONSTRUCTION
+==================================================================
+
+--- Digital Maturity (MD) Index ---
+Eigenvalues:
+       eigenvalue percentage of variance cumulative percentage of variance
+comp 1       5.50                  91.60                             91.60
+comp 2       0.20                   3.28                             94.89
+comp 3       0.13                   2.20                             97.08
+MD distribution saved to figures/MD_distribution.png
+
+--- Stock Market Performance (PB) Index ---
+Components needed for 80% variance: 5 
+PB distribution saved to figures/PB_distribution.png
+
+--- Descriptive Statistics ---
+MD: mean = 51.39 , sd = 30.5 
+PB: mean = 36.74 , sd = 20.57 
+Age: mean = 57.7 , range = 7 - 114 
+Correlation (MD, PB): 0.3467 
+
+==================================================================
+  H1: MD positively affects PB
+==================================================================
+
+--- OLS: PB ~ MD ---
+
+Call:
+lm(formula = PB ~ MD, data = TP)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-27.649 -11.753  -4.215   6.785  58.087 
+
+Coefficients:
+            Estimate Std. Error t value Pr(>|t|)    
+(Intercept) 24.73091    3.89359   6.352 7.52e-09 ***
+MD           0.23378    0.06524   3.583  0.00054 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 19.4 on 94 degrees of freedom
+Multiple R-squared:  0.1202,	Adjusted R-squared:  0.1108 
+F-statistic: 12.84 on 1 and 94 DF,  p-value: 0.0005401
+
+
+--- Diagnostic Tests ---
+Shapiro-Wilk (normality): 1.258549e-05 
+Breusch-Pagan (heteroscedasticity): 0.07429994 
+Durbin-Watson (autocorrelation): 0.9110851 
+
+--- Panel Models ---
+
+[Pooled OLS]
+              Estimate Std. Error  t-value     Pr(>|t|)
+(Intercept) 24.7309150  3.8935920 6.351696 7.519780e-09
+MD           0.2337802  0.0652436 3.583190 5.401425e-04
+
+[Within (Fixed Effects)]
+     Estimate Std. Error   t-value  Pr(>|t|)
+MD 0.06047544 0.06397659 0.9452745 0.3481302
+
+[Random Effects]
+              Estimate Std. Error  z-value     Pr(>|z|)
+(Intercept) 31.1547039 4.38104823 7.111244 1.150014e-12
+MD           0.1087788 0.05682667 1.914220 5.559202e-02
+
+[Between]
+              Estimate Std. Error  t-value    Pr(>|t|)
+(Intercept) 22.5455147  6.9268801 3.254786 0.002810942
+MD           0.2763062  0.1191449 2.319077 0.027386711
+
+--- Model Selection Tests ---
+Fisher test (within vs pooling): F = 13.97 , p = 3.096311e-18 
+Hausman test (within vs random): chi2 = 2.7 , p = 0.1002657 
+
+[Tobit Regression]
+
+Call:
+censReg(formula = PB ~ MD, data = pdata)
+
+Observations:
+         Total  Left-censored     Uncensored Right-censored 
+            96              1             95              0 
+
+Coefficients:
+            Estimate Std. error t value Pr(> t)    
+(Intercept) 32.37054    2.58363  12.529  <2e-16 ***
+MD           0.07746    0.04605   1.682  0.0926 .  
+logSigmaMu   2.84508    0.09884  28.784  <2e-16 ***
+logSigmaNu   2.18952    0.07790  28.108  <2e-16 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Newton-Raphson maximisation, 6 iterations
+Return code 1: gradient close to zero (gradtol)
+Log-likelihood: -381.6084 on 4 Df
+
+
+[Dynamic Model: PB ~ L(MD,1)]
+
+Time series regression with "numeric" data:
+Start = 1, End = 96
+
+Call:
+dynlm(formula = PB ~ L(MD, 1), data = pdata)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-27.649 -11.753  -4.215   6.785  58.087 
+
+Coefficients:
+            Estimate Std. Error t value Pr(>|t|)    
+(Intercept) 24.73091    3.89359   6.352 7.52e-09 ***
+L(MD, 1)     0.23378    0.06524   3.583  0.00054 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 19.4 on 94 degrees of freedom
+Multiple R-squared:  0.1202,	Adjusted R-squared:  0.1108 
+F-statistic: 12.84 on 1 and 94 DF,  p-value: 0.0005401
+
+
+[IV Regression: MD instrumented by lag(MD)]
+
+Call:
+ivreg(formula = PB ~ MD | lag(MD, 1), data = pdata)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-27.649 -11.753  -4.215   6.785  58.087 
+
+Coefficients:
+            Estimate Std. Error t value Pr(>|t|)    
+(Intercept) 24.73091    3.89359   6.352 7.52e-09 ***
+MD           0.23378    0.06524   3.583  0.00054 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 19.4 on 94 degrees of freedom
+Multiple R-Squared: 0.1202,	Adjusted R-squared: 0.1108 
+Wald test: 12.84 on 1 and 94 DF,  p-value: 0.0005401 
+
+
+[Mundlak Model]
+Oneway (individual) effect Random Effect Model 
+   (Swamy-Arora's transformation)
+
+Call:
+plm(formula = PB ~ MD + MD_mean, data = pdata_m, model = "random")
+
+Balanced Panel: n = 32, T = 3, N = 96
+
+Effects:
+                  var std.dev share
+idiosyncratic  71.268   8.442 0.186
+individual    312.010  17.664 0.814
+theta: 0.734
+
+Residuals:
+    Min.  1st Qu.   Median  3rd Qu.     Max. 
+-25.9451  -4.7135  -1.2732   2.8675  24.4920 
+
+Coefficients:
+             Estimate Std. Error z-value Pr(>|z|)   
+(Intercept) 22.545515   6.926880  3.2548 0.001135 **
+MD           0.060475   0.063977  0.9453 0.344519   
+MD_mean      0.215831   0.135235  1.5960 0.110496   
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Total Sum of Squares:    7074.9
+Residual Sum of Squares: 6627.9
+R-Squared:      0.063177
+Adj. R-Squared: 0.04303
+Chisq: 6.27166 on 2 DF, p-value: 0.043464
+
+[GAM Model]
+
+Family: gaussian 
+Link function: identity 
+
+Formula:
+PB ~ s(MD) + MD
+
+Parametric coefficients:
+            Estimate Std. Error t value Pr(>|t|)    
+(Intercept)  6.40078    1.00639    6.36 7.24e-09 ***
+MD           0.59047    0.03316   17.81  < 2e-16 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Approximate significance of smooth terms:
+         edf Ref.df     F p-value    
+s(MD) 0.7416 0.7416 54.35  <2e-16 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Rank: 10/11
+R-sq.(adj) =  0.111   Deviance explained =   12%
+GCV = 384.18  Scale est. = 376.17    n = 96
+
+[10-Fold CV RMSE]: 19.11 
+
+==================================================================
+  H2: Digital Investment positively affects PBR
+==================================================================
+
+[OLS: PBR ~ InvestissementDigital + ROE]
+
+Call:
+lm(formula = PBR ~ InvestissementDigital + ROE, data = TP)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-2.4103 -0.9991 -0.2077  0.6934  4.3296 
+
+Coefficients:
+                      Estimate Std. Error t value Pr(>|t|)    
+(Intercept)           -0.15397    0.44847  -0.343 0.732201    
+InvestissementDigital  0.41327    0.11922   3.467 0.000829 ***
+ROE                    0.15322    0.01719   8.914 8.07e-14 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 1.417 on 85 degrees of freedom
+  (8 observations deleted due to missingness)
+Multiple R-squared:  0.535,	Adjusted R-squared:  0.5241 
+F-statistic:  48.9 on 2 and 85 DF,  p-value: 7.34e-15
+
+
+[Log-Log Specification]
+
+Call:
+lm(formula = log(PBR + 0.01) ~ InvestissementDigital + log(ROE + 
+    0.01), data = TP)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-2.2940 -0.3299  0.0124  0.3753  3.3576 
+
+Coefficients:
+                      Estimate Std. Error t value Pr(>|t|)    
+(Intercept)           -0.57185    0.23122  -2.473  0.01546 *  
+InvestissementDigital  0.17118    0.05836   2.933  0.00435 ** 
+log(ROE + 0.01)        0.41486    0.05904   7.027  5.7e-10 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 0.665 on 82 degrees of freedom
+  (11 observations deleted due to missingness)
+Multiple R-squared:  0.4368,	Adjusted R-squared:  0.4231 
+F-statistic:  31.8 on 2 and 82 DF,  p-value: 5.99e-11
+
+
+Breusch-Pagan p-value: 9.542988e-13 
+HC3 Robust SE:
+
+t test of coefficients:
+
+                       Estimate Std. Error t value Pr(>|t|)   
+(Intercept)           -0.571853   0.962792 -0.5940 0.554178   
+InvestissementDigital  0.171179   0.064342  2.6605 0.009384 **
+log(ROE + 0.01)        0.414859   0.365132  1.1362 0.259187   
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+
+[Pooled Panel]
+Pooling Model
+
+Call:
+plm(formula = PBR ~ InvestissementDigital + ROE, data = pdata, 
+    model = "pooling")
+
+Unbalanced Panel: n = 30, T = 2-3, N = 88
+
+Residuals:
+    Min.  1st Qu.   Median  3rd Qu.     Max. 
+-2.41032 -0.99908 -0.20775  0.69344  4.32963 
+
+Coefficients:
+                       Estimate Std. Error t-value  Pr(>|t|)    
+(Intercept)           -0.153971   0.448467 -0.3433  0.732201    
+InvestissementDigital  0.413274   0.119216  3.4666  0.000829 ***
+ROE                    0.153221   0.017189  8.9138 8.071e-14 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Total Sum of Squares:    366.9
+Residual Sum of Squares: 170.6
+R-Squared:      0.53503
+Adj. R-Squared: 0.52409
+F-statistic: 48.903 on 2 and 85 DF, p-value: 7.3403e-15
+Robust clustered SE:
+
+t test of coefficients:
+
+                       Estimate Std. Error t value  Pr(>|t|)    
+(Intercept)           -0.153971   0.568437 -0.2709    0.7872    
+InvestissementDigital  0.413274   0.164706  2.5092    0.0140 *  
+ROE                    0.153221   0.025375  6.0382 3.965e-08 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+
+==================================================================
+  H3: Digitalized companies pay higher dividends
+==================================================================
+
+[Pooled: log(Dividends) ~ MD + collaborateurs]
+Pooling Model
+
+Call:
+plm(formula = log(Dividendes + 0.01) ~ MD + collaborateurs, data = pdata, 
+    model = "pooling")
+
+Balanced Panel: n = 32, T = 3, N = 96
+
+Residuals:
+    Min.  1st Qu.   Median  3rd Qu.     Max. 
+-7.19994 -0.85319  0.48509  1.45664  4.86832 
+
+Coefficients:
+                  Estimate  Std. Error t-value  Pr(>|t|)    
+(Intercept)    -4.0945e-01  5.4298e-01 -0.7541 0.4527047    
+MD              3.7915e-02  9.4367e-03  4.0179 0.0001191 ***
+collaborateurs  4.9553e-05  1.3171e-04  0.3762 0.7076117    
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Total Sum of Squares:    798.12
+Residual Sum of Squares: 662.65
+R-Squared:      0.16974
+Adj. R-Squared: 0.15188
+F-statistic: 9.50622 on 2 and 93 DF, p-value: 0.00017522
+
+Fisher test p-value: 2.041208e-20 
+Hausman test p-value: 0.1751302 
+
+[Tobit Model]
+
+Call:
+tobit(formula = log(Dividendes + 0.01) ~ MD + DividendYield, 
+    left = 0, data = pdata)
+
+Observations:
+         Total  Left-censored     Uncensored Right-censored 
+            96             15             81              0 
+
+Coefficients:
+               Estimate Std. Error z value Pr(>|z|)    
+(Intercept)   -0.191922   0.389112  -0.493 0.621848    
+MD             0.020228   0.004848   4.172 3.02e-05 ***
+DividendYield  0.478726   0.079378   6.031 1.63e-09 ***
+Log(scale)     0.310725   0.081000   3.836 0.000125 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Scale: 1.364 
+
+Gaussian distribution
+Number of Newton-Raphson Iterations: 4 
+Log-likelihood: -151.6 on 4 Df
+Wald-statistic: 50.95 on 2 Df, p-value: 8.6537e-12 
+
+
+[Regression Discontinuity at MD = 77.84 ]
+[1] "Mass points detected in the running variable."
+
+==================================================================
+  H4: MD effect on PB varies by sector
+==================================================================
+
+[Pooled: PB ~ MD + Secteur + Age + collaborateurs]
+Pooling Model
+
+Call:
+plm(formula = PB ~ MD + factor(Secteur) + Age + collaborateurs, 
+    data = pdata, model = "pooling")
+
+Balanced Panel: n = 32, T = 3, N = 96
+
+Residuals:
+     Min.   1st Qu.    Median   3rd Qu.      Max. 
+-21.71247  -2.95134   0.36749   4.36417  29.06793 
+
+Coefficients:
+                                                                          Estimate
+(Intercept)                                                             41.0694742
+MD                                                                      -0.0274345
+factor(Secteur)Assurances                                               11.4502950
+factor(Secteur)Banques                                                   8.2942016
+factor(Secteur)Batiment et Materiaux de Construction                     7.3624774
+factor(Secteur)Boissons                                                -20.0527075
+factor(Secteur)Chimie                                                  -18.2545258
+factor(Secteur)Distributeurs                                           -12.7490803
+factor(Secteur)Electricité                                              11.4246376
+factor(Secteur)Industrie Agricole                                      -13.6251933
+factor(Secteur)Industrie Pharmaceutique                                 -6.9170988
+factor(Secteur)Ingénieries et Biens d'Equipement Industriels           -32.7053523
+factor(Secteur)Loisirs et Hôtels                                       -24.9083073
+factor(Secteur)Matériels, Logiciels et Services Informatiques            1.9348400
+factor(Secteur)Mines                                                     1.1247946
+factor(Secteur)Participation et promotion immobilières                 -15.3843770
+factor(Secteur)Pétrole et Gaz                                           24.3479157
+factor(Secteur)Santé                                                   -37.4609988
+factor(Secteur)Services de transport                                   -12.2567447
+factor(Secteur)Sociétés de financement et Autres Activités Financières -10.2666086
+factor(Secteur)Sociétés de placement immobilier                         -8.9382964
+factor(Secteur)Sociétés de Portefeuilles / Holdings                    -30.3941771
+factor(Secteur)Sylviculture et Papier                                  -11.2666774
+factor(Secteur)Télécommunications                                       16.4992417
+factor(Secteur)Transport                                                -3.1031845
+Age                                                                     -0.1440491
+collaborateurs                                                           0.0059358
+                                                                        Std. Error
+(Intercept)                                                              9.9656586
+MD                                                                       0.0696253
+factor(Secteur)Assurances                                                6.8896478
+factor(Secteur)Banques                                                   7.5434065
+factor(Secteur)Batiment et Materiaux de Construction                     7.1112840
+factor(Secteur)Boissons                                                  7.9231540
+factor(Secteur)Chimie                                                    8.8529351
+factor(Secteur)Distributeurs                                             7.0801677
+factor(Secteur)Electricité                                              10.6050648
+factor(Secteur)Industrie Agricole                                       11.5193112
+factor(Secteur)Industrie Pharmaceutique                                  9.4788120
+factor(Secteur)Ingénieries et Biens d'Equipement Industriels             9.4632988
+factor(Secteur)Loisirs et Hôtels                                         9.7825470
+factor(Secteur)Matériels, Logiciels et Services Informatiques            9.5734332
+factor(Secteur)Mines                                                     6.6074345
+factor(Secteur)Participation et promotion immobilières                   9.4179184
+factor(Secteur)Pétrole et Gaz                                            8.6688351
+factor(Secteur)Santé                                                    11.3931129
+factor(Secteur)Services de transport                                    10.4025782
+factor(Secteur)Sociétés de financement et Autres Activités Financières   8.2902069
+factor(Secteur)Sociétés de placement immobilier                          9.5678867
+factor(Secteur)Sociétés de Portefeuilles / Holdings                      9.3913245
+factor(Secteur)Sylviculture et Papier                                    8.3200999
+factor(Secteur)Télécommunications                                       10.7844587
+factor(Secteur)Transport                                                 8.0104228
+Age                                                                      0.0993050
+collaborateurs                                                           0.0009814
+                                                                       t-value
+(Intercept)                                                             4.1211
+MD                                                                     -0.3940
+factor(Secteur)Assurances                                               1.6620
+factor(Secteur)Banques                                                  1.0995
+factor(Secteur)Batiment et Materiaux de Construction                    1.0353
+factor(Secteur)Boissons                                                -2.5309
+factor(Secteur)Chimie                                                  -2.0620
+factor(Secteur)Distributeurs                                           -1.8007
+factor(Secteur)Electricité                                              1.0773
+factor(Secteur)Industrie Agricole                                      -1.1828
+factor(Secteur)Industrie Pharmaceutique                                -0.7297
+factor(Secteur)Ingénieries et Biens d'Equipement Industriels           -3.4560
+factor(Secteur)Loisirs et Hôtels                                       -2.5462
+factor(Secteur)Matériels, Logiciels et Services Informatiques           0.2021
+factor(Secteur)Mines                                                    0.1702
+factor(Secteur)Participation et promotion immobilières                 -1.6335
+factor(Secteur)Pétrole et Gaz                                           2.8087
+factor(Secteur)Santé                                                   -3.2880
+factor(Secteur)Services de transport                                   -1.1782
+factor(Secteur)Sociétés de financement et Autres Activités Financières -1.2384
+factor(Secteur)Sociétés de placement immobilier                        -0.9342
+factor(Secteur)Sociétés de Portefeuilles / Holdings                    -3.2364
+factor(Secteur)Sylviculture et Papier                                  -1.3542
+factor(Secteur)Télécommunications                                       1.5299
+factor(Secteur)Transport                                               -0.3874
+Age                                                                    -1.4506
+collaborateurs                                                          6.0483
+                                                                        Pr(>|t|)
+(Intercept)                                                            0.0001033
+MD                                                                     0.6947736
+factor(Secteur)Assurances                                              0.1010585
+factor(Secteur)Banques                                                 0.2753585
+factor(Secteur)Batiment et Materiaux de Construction                   0.3041329
+factor(Secteur)Boissons                                                0.0136609
+factor(Secteur)Chimie                                                  0.0429785
+factor(Secteur)Distributeurs                                           0.0761244
+factor(Secteur)Electricité                                             0.2851066
+factor(Secteur)Industrie Agricole                                      0.2409428
+factor(Secteur)Industrie Pharmaceutique                                0.4680174
+factor(Secteur)Ingénieries et Biens d'Equipement Industriels           0.0009424
+factor(Secteur)Loisirs et Hôtels                                       0.0131265
+factor(Secteur)Matériels, Logiciels et Services Informatiques          0.8404292
+factor(Secteur)Mines                                                   0.8653261
+factor(Secteur)Participation et promotion immobilières                 0.1069144
+factor(Secteur)Pétrole et Gaz                                          0.0064649
+factor(Secteur)Santé                                                   0.0015895
+factor(Secteur)Services de transport                                   0.2427481
+factor(Secteur)Sociétés de financement et Autres Activités Financières 0.2197638
+factor(Secteur)Sociétés de placement immobilier                        0.3534598
+factor(Secteur)Sociétés de Portefeuilles / Holdings                    0.0018608
+factor(Secteur)Sylviculture et Papier                                  0.1801064
+factor(Secteur)Télécommunications                                      0.1306111
+factor(Secteur)Transport                                               0.6996574
+Age                                                                    0.1514300
+collaborateurs                                                         6.709e-08
+                                                                          
+(Intercept)                                                            ***
+MD                                                                        
+factor(Secteur)Assurances                                                 
+factor(Secteur)Banques                                                    
+factor(Secteur)Batiment et Materiaux de Construction                      
+factor(Secteur)Boissons                                                *  
+factor(Secteur)Chimie                                                  *  
+factor(Secteur)Distributeurs                                           .  
+factor(Secteur)Electricité                                                
+factor(Secteur)Industrie Agricole                                         
+factor(Secteur)Industrie Pharmaceutique                                   
+factor(Secteur)Ingénieries et Biens d'Equipement Industriels           ***
+factor(Secteur)Loisirs et Hôtels                                       *  
+factor(Secteur)Matériels, Logiciels et Services Informatiques             
+factor(Secteur)Mines                                                      
+factor(Secteur)Participation et promotion immobilières                    
+factor(Secteur)Pétrole et Gaz                                          ** 
+factor(Secteur)Santé                                                   ** 
+factor(Secteur)Services de transport                                      
+factor(Secteur)Sociétés de financement et Autres Activités Financières    
+factor(Secteur)Sociétés de placement immobilier                           
+factor(Secteur)Sociétés de Portefeuilles / Holdings                    ** 
+factor(Secteur)Sylviculture et Papier                                     
+factor(Secteur)Télécommunications                                         
+factor(Secteur)Transport                                                  
+Age                                                                       
+collaborateurs                                                         ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Total Sum of Squares:    40190
+Residual Sum of Squares: 8276.3
+R-Squared:      0.79407
+Adj. R-Squared: 0.71648
+F-statistic: 10.2334 on 26 and 69 DF, p-value: 6.538e-15
+
+Fisher test p-value: 1.612179e-06 
+Hausman test p-value: 0.5105828 
+
+[Dynamic Model with Sector Controls]
+
+Time series regression with "numeric" data:
+Start = 1, End = 96
+
+Call:
+dynlm(formula = PB ~ L(MD, 1) + factor(Secteur) + Age, data = pdata)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-30.548  -3.907  -0.048   3.842  37.202 
+
+Coefficients:
+                                                                        Estimate
+(Intercept)                                                             55.13908
+L(MD, 1)                                                                 0.13814
+factor(Secteur)Assurances                                                3.27772
+factor(Secteur)Banques                                                  30.27574
+factor(Secteur)Batiment et Materiaux de Construction                    -1.00236
+factor(Secteur)Boissons                                                -18.94266
+factor(Secteur)Chimie                                                  -21.39061
+factor(Secteur)Distributeurs                                             3.01522
+factor(Secteur)Electricité                                              -7.65072
+factor(Secteur)Industrie Agricole                                      -29.45741
+factor(Secteur)Industrie Pharmaceutique                                -19.69930
+factor(Secteur)Ingénieries et Biens d'Equipement Industriels           -43.42172
+factor(Secteur)Loisirs et Hôtels                                       -35.51829
+factor(Secteur)Matériels, Logiciels et Services Informatiques          -18.46573
+factor(Secteur)Mines                                                     7.00065
+factor(Secteur)Participation et promotion immobilières                 -22.77177
+factor(Secteur)Pétrole et Gaz                                           11.40275
+factor(Secteur)Santé                                                   -44.31813
+factor(Secteur)Services de transport                                   -17.35665
+factor(Secteur)Sociétés de financement et Autres Activités Financières -26.25185
+factor(Secteur)Sociétés de placement immobilier                        -21.05378
+factor(Secteur)Sociétés de Portefeuilles / Holdings                    -24.97272
+factor(Secteur)Sylviculture et Papier                                  -12.38666
+factor(Secteur)Télécommunications                                       31.27089
+factor(Secteur)Transport                                                -4.56716
+Age                                                                     -0.28745
+                                                                       Std. Error
+(Intercept)                                                              11.90107
+L(MD, 1)                                                                  0.07862
+factor(Secteur)Assurances                                                 8.29709
+factor(Secteur)Banques                                                    8.11821
+factor(Secteur)Batiment et Materiaux de Construction                      8.56686
+factor(Secteur)Boissons                                                   9.72809
+factor(Secteur)Chimie                                                    10.85394
+factor(Secteur)Distributeurs                                              8.08477
+factor(Secteur)Electricité                                               12.43518
+factor(Secteur)Industrie Agricole                                        13.77717
+factor(Secteur)Industrie Pharmaceutique                                  11.34824
+factor(Secteur)Ingénieries et Biens d'Equipement Industriels             11.41669
+factor(Secteur)Loisirs et Hôtels                                         11.81955
+factor(Secteur)Matériels, Logiciels et Services Informatiques            11.00357
+factor(Secteur)Mines                                                      8.02663
+factor(Secteur)Participation et promotion immobilières                   11.46879
+factor(Secteur)Pétrole et Gaz                                            10.31691
+factor(Secteur)Santé                                                     13.92283
+factor(Secteur)Services de transport                                     12.73373
+factor(Secteur)Sociétés de financement et Autres Activités Financières    9.65024
+factor(Secteur)Sociétés de placement immobilier                          11.49025
+factor(Secteur)Sociétés de Portefeuilles / Holdings                      11.48116
+factor(Secteur)Sylviculture et Papier                                    10.21568
+factor(Secteur)Télécommunications                                        12.90067
+factor(Secteur)Transport                                                  9.83339
+Age                                                                       0.11843
+                                                                       t value
+(Intercept)                                                              4.633
+L(MD, 1)                                                                 1.757
+factor(Secteur)Assurances                                                0.395
+factor(Secteur)Banques                                                   3.729
+factor(Secteur)Batiment et Materiaux de Construction                    -0.117
+factor(Secteur)Boissons                                                 -1.947
+factor(Secteur)Chimie                                                   -1.971
+factor(Secteur)Distributeurs                                             0.373
+factor(Secteur)Electricité                                              -0.615
+factor(Secteur)Industrie Agricole                                       -2.138
+factor(Secteur)Industrie Pharmaceutique                                 -1.736
+factor(Secteur)Ingénieries et Biens d'Equipement Industriels            -3.803
+factor(Secteur)Loisirs et Hôtels                                        -3.005
+factor(Secteur)Matériels, Logiciels et Services Informatiques           -1.678
+factor(Secteur)Mines                                                     0.872
+factor(Secteur)Participation et promotion immobilières                  -1.986
+factor(Secteur)Pétrole et Gaz                                            1.105
+factor(Secteur)Santé                                                    -3.183
+factor(Secteur)Services de transport                                    -1.363
+factor(Secteur)Sociétés de financement et Autres Activités Financières  -2.720
+factor(Secteur)Sociétés de placement immobilier                         -1.832
+factor(Secteur)Sociétés de Portefeuilles / Holdings                     -2.175
+factor(Secteur)Sylviculture et Papier                                   -1.213
+factor(Secteur)Télécommunications                                        2.424
+factor(Secteur)Transport                                                -0.464
+Age                                                                     -2.427
+                                                                       Pr(>|t|)
+(Intercept)                                                            1.62e-05
+L(MD, 1)                                                               0.083301
+factor(Secteur)Assurances                                              0.694012
+factor(Secteur)Banques                                                 0.000386
+factor(Secteur)Batiment et Materiaux de Construction                   0.907191
+factor(Secteur)Boissons                                                0.055522
+factor(Secteur)Chimie                                                  0.052706
+factor(Secteur)Distributeurs                                           0.710312
+factor(Secteur)Electricité                                             0.540386
+factor(Secteur)Industrie Agricole                                      0.035999
+factor(Secteur)Industrie Pharmaceutique                                0.086983
+factor(Secteur)Ingénieries et Biens d'Equipement Industriels           0.000302
+factor(Secteur)Loisirs et Hôtels                                       0.003683
+factor(Secteur)Matériels, Logiciels et Services Informatiques          0.097776
+factor(Secteur)Mines                                                   0.386093
+factor(Secteur)Participation et promotion immobilières                 0.051003
+factor(Secteur)Pétrole et Gaz                                          0.272836
+factor(Secteur)Santé                                                   0.002174
+factor(Secteur)Services de transport                                   0.177237
+factor(Secteur)Sociétés de financement et Autres Activités Financières 0.008220
+factor(Secteur)Sociétés de placement immobilier                        0.071158
+factor(Secteur)Sociétés de Portefeuilles / Holdings                    0.033002
+factor(Secteur)Sylviculture et Papier                                  0.229392
+factor(Secteur)Télécommunications                                      0.017938
+factor(Secteur)Transport                                               0.643764
+Age                                                                    0.017794
+                                                                          
+(Intercept)                                                            ***
+L(MD, 1)                                                               .  
+factor(Secteur)Assurances                                                 
+factor(Secteur)Banques                                                 ***
+factor(Secteur)Batiment et Materiaux de Construction                      
+factor(Secteur)Boissons                                                .  
+factor(Secteur)Chimie                                                  .  
+factor(Secteur)Distributeurs                                              
+factor(Secteur)Electricité                                                
+factor(Secteur)Industrie Agricole                                      *  
+factor(Secteur)Industrie Pharmaceutique                                .  
+factor(Secteur)Ingénieries et Biens d'Equipement Industriels           ***
+factor(Secteur)Loisirs et Hôtels                                       ** 
+factor(Secteur)Matériels, Logiciels et Services Informatiques          .  
+factor(Secteur)Mines                                                      
+factor(Secteur)Participation et promotion immobilières                 .  
+factor(Secteur)Pétrole et Gaz                                             
+factor(Secteur)Santé                                                   ** 
+factor(Secteur)Services de transport                                      
+factor(Secteur)Sociétés de financement et Autres Activités Financières ** 
+factor(Secteur)Sociétés de placement immobilier                        .  
+factor(Secteur)Sociétés de Portefeuilles / Holdings                    *  
+factor(Secteur)Sylviculture et Papier                                     
+factor(Secteur)Télécommunications                                      *  
+factor(Secteur)Transport                                                  
+Age                                                                    *  
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 13.45 on 70 degrees of freedom
+Multiple R-squared:  0.6849,	Adjusted R-squared:  0.5724 
+F-statistic: 6.086 on 25 and 70 DF,  p-value: 1.118e-09
+
+
+[Tobit with Sector Dummies]
+
+Call:
+tobit(formula = PB ~ MD + factor(Secteur), left = 0, data = pdata)
+
+Observations:
+         Total  Left-censored     Uncensored Right-censored 
+            96              1             95              0 
+
+Coefficients:
+                                                                        Estimate
+(Intercept)                                                             31.08623
+MD                                                                       0.09681
+factor(Secteur)Assurances                                               10.35075
+factor(Secteur)Banques                                                  25.53267
+factor(Secteur)Batiment et Materiaux de Construction                     7.23403
+factor(Secteur)Boissons                                                -18.00572
+factor(Secteur)Chimie                                                  -14.10724
+factor(Secteur)Distributeurs                                             8.39488
+factor(Secteur)Electricité                                              11.29002
+factor(Secteur)Industrie Agricole                                       -5.27776
+factor(Secteur)Industrie Pharmaceutique                                 -6.27337
+factor(Secteur)Ingénieries et Biens d'Equipement Industriels           -28.71004
+factor(Secteur)Loisirs et Hôtels                                       -18.50841
+factor(Secteur)Matériels, Logiciels et Services Informatiques           -1.21752
+factor(Secteur)Mines                                                    11.88219
+factor(Secteur)Participation et promotion immobilières                  -8.99549
+factor(Secteur)Pétrole et Gaz                                           11.39914
+factor(Secteur)Santé                                                   -19.98154
+factor(Secteur)Services de transport                                     3.19406
+factor(Secteur)Sociétés de financement et Autres Activités Financières -12.47195
+factor(Secteur)Sociétés de placement immobilier                         -6.17631
+factor(Secteur)Sociétés de Portefeuilles / Holdings                     -9.54373
+factor(Secteur)Sylviculture et Papier                                  -10.46783
+factor(Secteur)Télécommunications                                       51.13721
+factor(Secteur)Transport                                               -10.33103
+Log(scale)                                                               2.49046
+                                                                       Std. Error
+(Intercept)                                                               5.91216
+MD                                                                        0.06886
+factor(Secteur)Assurances                                                 6.96931
+factor(Secteur)Banques                                                    7.06890
+factor(Secteur)Batiment et Materiaux de Construction                      7.05688
+factor(Secteur)Boissons                                                   8.72044
+factor(Secteur)Chimie                                                     9.28560
+factor(Secteur)Distributeurs                                              6.97516
+factor(Secteur)Electricité                                                8.68573
+factor(Secteur)Industrie Agricole                                         8.53760
+factor(Secteur)Industrie Pharmaceutique                                   8.88943
+factor(Secteur)Ingénieries et Biens d'Equipement Industriels              8.67949
+factor(Secteur)Loisirs et Hôtels                                          8.53860
+factor(Secteur)Matériels, Logiciels et Services Informatiques             7.53682
+factor(Secteur)Mines                                                      6.97117
+factor(Secteur)Participation et promotion immobilières                    8.94058
+factor(Secteur)Pétrole et Gaz                                             9.25555
+factor(Secteur)Santé                                                      8.66590
+factor(Secteur)Services de transport                                      8.53250
+factor(Secteur)Sociétés de financement et Autres Activités Financières    7.00070
+factor(Secteur)Sociétés de placement immobilier                           8.71892
+factor(Secteur)Sociétés de Portefeuilles / Holdings                       8.57718
+factor(Secteur)Sylviculture et Papier                                     9.13725
+factor(Secteur)Télécommunications                                         8.94577
+factor(Secteur)Transport                                                  8.56066
+Log(scale)                                                                0.07276
+                                                                       z value
+(Intercept)                                                              5.258
+MD                                                                       1.406
+factor(Secteur)Assurances                                                1.485
+factor(Secteur)Banques                                                   3.612
+factor(Secteur)Batiment et Materiaux de Construction                     1.025
+factor(Secteur)Boissons                                                 -2.065
+factor(Secteur)Chimie                                                   -1.519
+factor(Secteur)Distributeurs                                             1.204
+factor(Secteur)Electricité                                               1.300
+factor(Secteur)Industrie Agricole                                       -0.618
+factor(Secteur)Industrie Pharmaceutique                                 -0.706
+factor(Secteur)Ingénieries et Biens d'Equipement Industriels            -3.308
+factor(Secteur)Loisirs et Hôtels                                        -2.168
+factor(Secteur)Matériels, Logiciels et Services Informatiques           -0.162
+factor(Secteur)Mines                                                     1.704
+factor(Secteur)Participation et promotion immobilières                  -1.006
+factor(Secteur)Pétrole et Gaz                                            1.232
+factor(Secteur)Santé                                                    -2.306
+factor(Secteur)Services de transport                                     0.374
+factor(Secteur)Sociétés de financement et Autres Activités Financières  -1.782
+factor(Secteur)Sociétés de placement immobilier                         -0.708
+factor(Secteur)Sociétés de Portefeuilles / Holdings                     -1.113
+factor(Secteur)Sylviculture et Papier                                   -1.146
+factor(Secteur)Télécommunications                                        5.716
+factor(Secteur)Transport                                                -1.207
+Log(scale)                                                              34.228
+                                                                       Pr(>|z|)
+(Intercept)                                                            1.46e-07
+MD                                                                     0.159760
+factor(Secteur)Assurances                                              0.137494
+factor(Secteur)Banques                                                 0.000304
+factor(Secteur)Batiment et Materiaux de Construction                   0.305315
+factor(Secteur)Boissons                                                0.038944
+factor(Secteur)Chimie                                                  0.128697
+factor(Secteur)Distributeurs                                           0.228768
+factor(Secteur)Electricité                                             0.193657
+factor(Secteur)Industrie Agricole                                      0.536458
+factor(Secteur)Industrie Pharmaceutique                                0.480368
+factor(Secteur)Ingénieries et Biens d'Equipement Industriels           0.000940
+factor(Secteur)Loisirs et Hôtels                                       0.030188
+factor(Secteur)Matériels, Logiciels et Services Informatiques          0.871666
+factor(Secteur)Mines                                                   0.088292
+factor(Secteur)Participation et promotion immobilières                 0.314347
+factor(Secteur)Pétrole et Gaz                                          0.218098
+factor(Secteur)Santé                                                   0.021124
+factor(Secteur)Services de transport                                   0.708151
+factor(Secteur)Sociétés de financement et Autres Activités Financières 0.074826
+factor(Secteur)Sociétés de placement immobilier                        0.478710
+factor(Secteur)Sociétés de Portefeuilles / Holdings                    0.265842
+factor(Secteur)Sylviculture et Papier                                  0.251952
+factor(Secteur)Télécommunications                                      1.09e-08
+factor(Secteur)Transport                                               0.227508
+Log(scale)                                                              < 2e-16
+                                                                          
+(Intercept)                                                            ***
+MD                                                                        
+factor(Secteur)Assurances                                                 
+factor(Secteur)Banques                                                 ***
+factor(Secteur)Batiment et Materiaux de Construction                      
+factor(Secteur)Boissons                                                *  
+factor(Secteur)Chimie                                                     
+factor(Secteur)Distributeurs                                              
+factor(Secteur)Electricité                                                
+factor(Secteur)Industrie Agricole                                         
+factor(Secteur)Industrie Pharmaceutique                                   
+factor(Secteur)Ingénieries et Biens d'Equipement Industriels           ***
+factor(Secteur)Loisirs et Hôtels                                       *  
+factor(Secteur)Matériels, Logiciels et Services Informatiques             
+factor(Secteur)Mines                                                   .  
+factor(Secteur)Participation et promotion immobilières                    
+factor(Secteur)Pétrole et Gaz                                             
+factor(Secteur)Santé                                                   *  
+factor(Secteur)Services de transport                                      
+factor(Secteur)Sociétés de financement et Autres Activités Financières .  
+factor(Secteur)Sociétés de placement immobilier                           
+factor(Secteur)Sociétés de Portefeuilles / Holdings                       
+factor(Secteur)Sylviculture et Papier                                     
+factor(Secteur)Télécommunications                                      ***
+factor(Secteur)Transport                                                  
+Log(scale)                                                             ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Scale: 12.07 
+
+Gaussian distribution
+Number of Newton-Raphson Iterations: 6 
+Log-likelihood: -372.6 on 26 Df
+Wald-statistic: 182.7 on 24 Df, p-value: < 2.22e-16 
+
+
+==================================================================
+  H5: Age moderates the MD-PB relationship
+==================================================================
+
+[Pooled: PB ~ MD + Age + MD*Age]
+Pooling Model
+
+Call:
+plm(formula = PB ~ MD + Age + MD * Age, data = pdata, model = "pooling")
+
+Balanced Panel: n = 32, T = 3, N = 96
+
+Residuals:
+    Min.  1st Qu.   Median  3rd Qu.     Max. 
+-27.5582 -13.1152  -3.8597   9.3000  55.6232 
+
+Coefficients:
+              Estimate Std. Error t-value Pr(>|t|)  
+(Intercept) 13.5836193  9.9070903  1.3711  0.17368  
+MD           0.3482003  0.1568842  2.2195  0.02891 *
+Age          0.2078251  0.1693343  1.2273  0.22284  
+MD:Age      -0.0022069  0.0026005 -0.8486  0.39828  
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Total Sum of Squares:    40190
+Residual Sum of Squares: 34570
+R-Squared:      0.13983
+Adj. R-Squared: 0.11178
+F-statistic: 4.98528 on 3 and 92 DF, p-value: 0.0029995
+
+Fisher test p-value: 8.319478e-18 
+
+[Tobit: PB ~ MD + Age]
+
+Call:
+censReg(formula = PB ~ MD + Age, data = pdata)
+
+Observations:
+         Total  Left-censored     Uncensored Right-censored 
+            96              1             95              0 
+
+Coefficients:
+            Estimate Std. error t value Pr(> t)    
+(Intercept) 30.21900    3.37979   8.941  <2e-16 ***
+MD           0.06864    0.04121   1.666  0.0958 .  
+Age          0.05185    0.04954   1.047  0.2952    
+logSigmaMu   2.85953    0.08716  32.809  <2e-16 ***
+logSigmaNu   2.17734    0.07849  27.742  <2e-16 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Newton-Raphson maximisation, 4 iterations
+Return code 8: successive function values within relative tolerance limit (reltol)
+Log-likelihood: -381.1339 on 5 Df
+
+
+[Dynamic: PB ~ L(MD,1) + Age]
+
+Time series regression with "numeric" data:
+Start = 1, End = 96
+
+Call:
+dynlm(formula = PB ~ L(MD, 1) + Age, data = pdata)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-26.543 -13.058  -3.981   8.530  54.569 
+
+Coefficients:
+            Estimate Std. Error t value Pr(>|t|)    
+(Intercept) 20.76650    5.14131   4.039 0.000110 ***
+L(MD, 1)     0.22720    0.06535   3.477 0.000774 ***
+Age          0.07458    0.06334   1.178 0.241994    
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 19.36 on 93 degrees of freedom
+Multiple R-squared:  0.1331,	Adjusted R-squared:  0.1145 
+F-statistic: 7.139 on 2 and 93 DF,  p-value: 0.001305
+
+
+[GAM: PB ~ s(MD, by=Age) + MD + Age]
+
+Family: gaussian 
+Link function: identity 
+
+Formula:
+PB ~ s(MD, by = Age) + MD + Age
+
+Parametric coefficients:
+            Estimate Std. Error t value Pr(>|t|)    
+(Intercept) 0.009179   0.001068   8.593 1.93e-13 ***
+MD          0.542722   0.067079   8.091 2.19e-12 ***
+Age         0.075671   0.026789   2.825  0.00579 ** 
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Approximate significance of smooth terms:
+          edf Ref.df     F  p-value    
+s(MD):Age 1.5    1.5 8.872 0.000687 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Rank: 11/13
+R-sq.(adj) =  0.104   Deviance explained = 12.2%
+GCV = 391.54  Scale est. = 379.31    n = 96
+
+[Cox Survival: Age ~ MD (event: high tech adoption)]
+Call:
+coxph(formula = Surv(Age, surv_event) ~ MD, data = pdata)
+
+  n= 96, number of events= 36 
+
+      coef exp(coef) se(coef)     z Pr(>|z|)    
+MD 0.06010   1.06195  0.01084 5.544 2.95e-08 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+   exp(coef) exp(-coef) lower .95 upper .95
+MD     1.062     0.9417      1.04     1.085
+
+Concordance= 0.843  (se = 0.033 )
+Likelihood ratio test= 49.58  on 1 df,   p=2e-12
+Wald test            = 30.74  on 1 df,   p=3e-08
+Score (logrank) test = 39.93  on 1 df,   p=3e-10
+
+
+==================================================================
+  BONUS: Digital Manager Presence Effect
+==================================================================
+
+[Dynamic: PB ~ ResponsableDigitale + collaborateurs]
+
+Time series regression with "numeric" data:
+Start = 1, End = 96
+
+Call:
+dynlm(formula = PB ~ ResponsableDigitale + collaborateurs, data = pdata)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-30.717  -8.843  -1.579   8.505  35.101 
+
+Coefficients:
+                        Estimate Std. Error t value Pr(>|t|)    
+(Intercept)            2.133e+01  2.710e+00   7.869 6.35e-12 ***
+ResponsableDigitaleYes 1.004e+01  3.489e+00   2.878  0.00496 ** 
+collaborateurs         5.087e-03  7.769e-04   6.548 3.18e-09 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 15.7 on 93 degrees of freedom
+Multiple R-squared:  0.4297,	Adjusted R-squared:  0.4174 
+F-statistic: 35.03 on 2 and 93 DF,  p-value: 4.567e-12
+

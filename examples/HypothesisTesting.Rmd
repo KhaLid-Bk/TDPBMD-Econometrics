@@ -1,0 +1,139 @@
+---
+title: "Transformation digitale et performance boursiere Modelisation econometriques"
+author: "BOUKHIT KHALID"
+output: 
+  html_document: 
+    toc: true
+    toc_float: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+<!-- Step-by-Step Hypothesis Testing -->
+```{r}
+suppressPackageStartupMessages({
+  library(readr); library(FactoMineR); library(ggplot2); library(dplyr)
+  library(plm); library(scales); library(car); library(lmtest)
+  library(sandwich); library(censReg); library(dynlm); library(mgcv)
+  library(viridis)
+})
+
+# --- Load Data & Build Indices -----------------------------------------------
+TP <- read_csv(file.choose())
+TP$Secteur <- as.factor(TP$Secteur)
+TP$year <- as.factor(TP$year)
+
+# MD Index
+res.pca.md <- PCA(TP[, c("engagementDirection", "Competences", "Automatisation",
+                           "AdoptionTech", "CoutsOperationnels", "InvestissementDigital")],
+                  graph = FALSE)
+TP$MD <- scales::rescale(res.pca.md$ind$coord[, 1], to = c(0, 100))
+
+# PB Index
+res.pca.pb <- PCA(TP[, c("CapitalSocial", "CapitauxPropres", "CA", "BPA",
+                           "ROE", "DividendYield", "PER", "ROA")], graph = FALSE)
+cumvar <- cumsum(res.pca.pb$eig[, "percentage of variance"])
+nc <- which(cumvar >= 80)[1]
+w <- res.pca.pb$eig[1:nc, "percentage of variance"] / sum(res.pca.pb$eig[1:nc, "percentage of variance"])
+TP$PB <- as.vector(res.pca.pb$ind$coord[, 1:nc] %*% w)
+TP$PB <- scales::rescale(TP$PB, to = c(0, 100))
+
+# Panel
+pdata <- pdata.frame(TP, index = c("id", "year"))
+
+# <!-- H1 Walkthrough -->
+cat("\n=== H1: DIGITAL MATURITY -> PERFORMANCE ===\n\n")
+
+# Step 1: Scatter plot
+g <- ggplot(TP, aes(x = MD, y = PB)) +
+  geom_point(alpha = 0.6, color = "#1f77b4") +
+  geom_smooth(method = "lm", color = "red", se = TRUE) +
+  labs(title = "H1: MD vs PB", x = "Digital Maturity (MD)", y = "Performance (PB)") +
+  theme_minimal()
+g
+
+# Step 2: Simple OLS
+model_ols <- lm(PB ~ MD, data = TP)
+cat("\nStep 2 — OLS:\n")
+print(coef(summary(model_ols)))
+
+# Step 3: Pooled OLS
+model_pool <- plm(PB ~ MD, pdata, model = "pooling")
+cat("\nStep 3 — Pooled OLS:\n")
+print(coef(summary(model_pool)))
+
+# Step 4: Fixed Effects
+model_fe <- plm(PB ~ MD, pdata, model = "within")
+cat("\nStep 4 — Fixed Effects:\n")
+print(coef(summary(model_fe)))
+
+# Step 5: Random Effects
+model_re <- plm(PB ~ MD, pdata, model = "random")
+cat("\nStep 5 — Random Effects:\n")
+print(coef(summary(model_re)))
+
+# Step 6: Model selection
+cat("\nStep 6 — Fisher test (within vs pooled): p =", pFtest(model_fe, model_pool)$p.value, "\n")
+cat("         Hausman test (within vs random): p =", phtest(model_fe, model_re)$p.value, "\n")
+
+# Step 7: Diagnostics
+cat("\nStep 7 — Shapiro-Wilk p =", shapiro.test(residuals(model_ols))$p.value, "\n")
+cat("         Breusch-Pagan p =", bptest(model_ols)$p.value, "\n")
+cat("         Durbin-Watson =", durbinWatsonTest(model_ols)$dw, "\n")
+
+# Step 8: Tobit
+model_tobit <- censReg(PB ~ MD, data = pdata)
+cat("\nStep 8 — Tobit coefficient for MD:",
+    round(coef(model_tobit)["MD"], 4), "\n")
+
+# Step 9: Dynamic
+model_dyn <- dynlm(PB ~ L(MD, 1), data = pdata)
+cat("\nStep 9 — Dynamic (lagged MD) coefficient:",
+    round(coef(summary(model_dyn))["L(MD, 1)", "Estimate"], 4), "\n")
+
+# <!-- H5 Walkthrough -->
+cat("\n\n=== H5: AGE MODERATES MD EFFECT ===\n\n")
+
+# Step 1: Interaction model
+model_inter <- lm(PB ~ MD * Age, data = TP)
+cat("Interaction model:\n")
+print(coef(summary(model_inter)))
+
+# Step 2: Interpretation
+md_coef <- coef(summary(model_inter))["MD", "Estimate"]
+int_coef <- coef(summary(model_inter))["MD:Age", "Estimate"]
+cat("\nInterpretation:\n")
+cat("  MD effect at Age=0:", round(md_coef, 4), "\n")
+cat("  Change in MD effect per year of age:", round(int_coef, 4), "\n")
+if (int_coef < 0) {
+  cat("  => MD effect DECREASES with age (younger firms benefit more)\n")
+} else {
+  cat("  => MD effect INCREASES with age\n")
+}
+
+# Step 3: GAM visualization
+model_gam <- gam(PB ~ s(MD, by = Age) + MD + Age, data = TP)
+data_grid <- expand.grid(
+  MD = seq(min(TP$MD), max(TP$MD), length.out = 100),
+  Age = quantile(TP$Age, probs = c(0.1, 0.5, 0.9))
+)
+g5 <- ggplot(data_grid, aes(x = MD, y = predict(model_gam, newdata = data_grid),
+                             color = factor(Age))) +
+  geom_line(linewidth = 1.2) +
+  scale_color_viridis(discrete = TRUE, name = "Age Percentile",
+                      labels = c("10th (Young)", "50th (Median)", "90th (Old)")) +
+  labs(title = "H5: MD-PB Relationship by Firm Age",
+       x = "Digital Maturity", y = "Predicted PB") +
+  theme_minimal() + theme(legend.position = "bottom")
+g5
+
+cat("\n=== HYPOTHESIS TESTING COMPLETE ===\n")
+
+```
+
+
+
